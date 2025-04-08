@@ -1,0 +1,178 @@
+/* API Documentation Styles */
+:root {
+    --api-primary: #2c3e50;
+    --api-secondary: #34495e;
+    --api-accent: #3498db;
+    --api-success: #27ae60;
+    --api-warning: #f1c40f;
+    --api-danger: #e74c3c;
+    --api-light: #ecf0f1;
+    --api-dark: #2c3e50;
+}
+
+/* Layout */
+.api-wrapper {
+    min-height: 100vh;
+    background-color: var(--api-light);
+}
+
+/* Documentation Header */
+.api-header {
+    background-color: var(--api-primary);
+    color: white;
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+}
+
+.api-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.api-description {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+/* API Endpoints */
+.endpoint {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+}
+
+.endpoint-method {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-right: 1rem;
+}
+
+.method-get { background-color: #61affe; color: white; }
+.method-post { background-color: #49cc90; color: white; }
+.method-put { background-color: #fca130; color: white; }
+.method-delete { background-color: #f93e3e; color: white; }
+
+.endpoint-path {
+    font-family: monospace;
+    font-size: 1.1rem;
+    color: var(--api-dark);
+}
+
+.endpoint-description {
+    margin-top: 1rem;
+    color: #666;
+}
+
+/* Parameters Table */
+.parameters-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+}
+
+.parameters-table th,
+.parameters-table td {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.parameters-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+.parameters-table tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+/* Response Examples */
+.response-example {
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    padding: 1rem;
+    margin: 1rem 0;
+}
+
+.response-example pre {
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+}
+
+/* Authentication */
+.auth-section {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.auth-token {
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 0.5rem;
+    font-family: monospace;
+    word-break: break-all;
+}
+
+/* Navigation */
+.api-nav {
+    position: sticky;
+    top: 2rem;
+}
+
+.api-nav .nav-link {
+    color: var(--api-dark);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.api-nav .nav-link:hover {
+    background-color: var(--api-light);
+    color: var(--api-accent);
+}
+
+.api-nav .nav-link.active {
+    background-color: var(--api-accent);
+    color: white;
+}
+
+/* Code Blocks */
+code {
+    background-color: #f8f9fa;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.9em;
+}
+
+pre code {
+    display: block;
+    padding: 1rem;
+    overflow-x: auto;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .api-title {
+        font-size: 2rem;
+    }
+    
+    .endpoint {
+        padding: 1rem;
+    }
+    
+    .parameters-table {
+        display: block;
+        overflow-x: auto;
+    }
+} 
