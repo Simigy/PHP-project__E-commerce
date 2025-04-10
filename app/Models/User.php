@@ -12,7 +12,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens;
+    use HasApiTokens, HasFactory, Notifiable;
 
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
@@ -25,12 +25,14 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
+    // Add 'google_id' to the $fillable array
     protected $fillable = [
         'name',
         'email',
         'password',
         'access_token',
         'role',
+        'google_id',
     ];
 
     /**
@@ -65,5 +67,10 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function favorites()
+    {
+        return $this->belongsToMany(Product::class, 'favorites', 'user_id', 'product_id');
     }
 }

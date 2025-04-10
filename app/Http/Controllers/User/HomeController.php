@@ -10,7 +10,16 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $products = Product::all();
-        return view('user.home', compact('products'));
+        try {
+            $products = Product::with('category')
+                ->where('status', 'active')
+                ->orderBy('created_at', 'desc')
+                ->paginate(12);
+                
+            return view('user.home', compact('products'));
+        } catch (\Exception $e) {
+            \Log::error('Error in HomeController@index: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'An error occurred while loading products. Please try again later.');
+        }
     }
 }

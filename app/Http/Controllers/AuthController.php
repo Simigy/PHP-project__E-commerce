@@ -22,9 +22,9 @@ class AuthController extends Controller
             Log::info('User authenticated', ['user' => $user->toArray()]);
             
             if ($user->role === 'admin') {
-                Log::info('Admin user detected, redirecting to admin route');
+                Log::info('Admin user detected, redirecting to corona dashboard');
                 session()->put('user_role', 'admin');
-                return redirect('/admin');  // Changed to use direct path instead of route name
+                return redirect()->route('admin.corona');
             }
             
             Log::info('Regular user detected, redirecting to user products');

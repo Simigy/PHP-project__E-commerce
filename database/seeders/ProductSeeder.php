@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Product;
+use Illuminate\Support\Facades\DB;
 
 class ProductSeeder extends Seeder
 {
@@ -15,30 +15,37 @@ class ProductSeeder extends Seeder
     {
         $products = [
             [
-                'name' => 'Sample Product 1',
-                'price' => 99.99,
-                'desc' => 'This is a sample product description 1',
-                'quantity' => 10,
-                'image' => 'products/sample1.jpg',
+                'name' => 'iPhone 16',
+                'description' => 'Latest iPhone model with advanced features and cutting-edge technology.',
+                'price' => 1299.99,
+                'image' => 'products/dXcShnt6ZvDrQ6hEh318AeZJygGOZlQBzNBgCoe1.png',
+                'quantity' => 50,
+                'status' => 'active',
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
-                'name' => 'Sample Product 2',
-                'price' => 149.99,
-                'desc' => 'This is a sample product description 2',
-                'quantity' => 15,
-                'image' => 'products/sample2.jpg',
+                'name' => 'Premium Laptop',
+                'description' => 'High-performance laptop with powerful specifications for professional use.',
+                'price' => 1599.99,
+                'image' => 'products/eAidRC2CqiZDTAxgHYWIids5h6fnekT7OkJFdmiG.png',
+                'quantity' => 30,
+                'status' => 'active',
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
-                'name' => 'Sample Product 3',
-                'price' => 199.99,
-                'desc' => 'This is a sample product description 3',
-                'quantity' => 20,
-                'image' => 'products/sample3.jpg',
+                'name' => 'Watch 5',
+                'description' => 'Smart watch with health monitoring and fitness tracking features.',
+                'price' => 399.99,
+                'image' => 'products/Watch 5.png',
+                'quantity' => 100,
+                'status' => 'active',
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
         ];
 
-        foreach ($products as $product) {
-            Product::create($product);
-        }
+        DB::table('products')->insert($products);
     }
 }

@@ -41,7 +41,7 @@ class CoronaDashboardController extends Controller
             $usersLastMonth = User::where('created_at', '<', $lastMonth)->count();
             $userGrowth = $usersLastMonth > 0 ? (($totalUsers - $usersLastMonth) / $usersLastMonth) * 100 : 0;
             
-            // Get total revenue - using sum of order amounts
+            // Get total revenue - using sum of order amounts or set default if no orders
             $totalRevenue = Order::sum('total_amount') ?? 0;
             $revenueLastMonth = Order::where('created_at', '<', $lastMonth)->sum('total_amount') ?? 0;
             $revenueGrowth = $revenueLastMonth > 0 ? (($totalRevenue - $revenueLastMonth) / $revenueLastMonth) * 100 : 0;
@@ -58,20 +58,13 @@ class CoronaDashboardController extends Controller
                 ->take(5)
                 ->get();
 
-            // Get monthly transaction history
-            $monthlyTransactions = Order::selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month, SUM(total_amount) as total')
-                ->groupBy('month')
-                ->orderBy('month', 'desc')
-                ->take(7)
-                ->get();
-
             Log::info('Corona Dashboard Data Loaded Successfully', [
                 'products_count' => $totalProducts,
                 'orders_count' => $totalOrders,
                 'users_count' => $totalUsers
             ]);
 
-            return view('admin.corona-dashboard', compact(
+            return view('admin.corona', compact(
                 'totalProducts',
                 'productGrowth',
                 'totalOrders',
@@ -81,15 +74,14 @@ class CoronaDashboardController extends Controller
                 'totalRevenue',
                 'revenueGrowth',
                 'recentOrders',
-                'lowStockProducts',
-                'monthlyTransactions'
+                'lowStockProducts'
             ));
         } catch (\Exception $e) {
             Log::error('Error in Corona Dashboard', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            return redirect()->back()->with('error', 'An error occurred while loading the dashboard.');
+            return redirect()->route('home')->with('error', 'An error occurred while loading the dashboard.');
         }
     }
 }

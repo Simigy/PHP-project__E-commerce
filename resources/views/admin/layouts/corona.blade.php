@@ -8,16 +8,16 @@
     <title>@yield('title', 'Admin Dashboard')</title>
 
     <!-- Core CSS -->
-    <link rel="stylesheet" href="{{ asset('assets/vendors/mdi/css/materialdesignicons.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/vendors/css/vendor.bundle.base.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/custom.css') }}">
+    <link rel="stylesheet" href="{{ asset('Admin/assets/vendors/mdi/css/materialdesignicons.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('Admin/assets/vendors/css/vendor.bundle.base.css') }}">
+    <link rel="stylesheet" href="{{ asset('Admin/assets/css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('Admin/assets/css/custom.css') }}">
 
     <!-- Plugins CSS -->
-    <link rel="stylesheet" href="{{ asset('assets/vendors/jvectormap/jquery-jvectormap.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/vendors/flag-icon-css/css/flag-icon.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/vendors/owl-carousel-2/owl.carousel.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/vendors/owl-carousel-2/owl.theme.default.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('Admin/assets/vendors/jvectormap/jquery-jvectormap.css') }}">
+    <link rel="stylesheet" href="{{ asset('Admin/assets/vendors/flag-icon-css/css/flag-icon.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('Admin/assets/vendors/owl-carousel-2/owl.carousel.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('Admin/assets/vendors/owl-carousel-2/owl.theme.default.min.css') }}">
 
     <!-- Inline critical styles -->
     <style>
@@ -216,6 +216,7 @@
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             padding: 0.5rem 0;
+            min-width: 12rem;
         }
 
         .dropdown-item {
@@ -231,6 +232,44 @@
 
         .dropdown-divider {
             border-color: var(--border-color);
+        }
+
+        /* Profile dropdown specifics */
+        #profileDropdown + .dropdown-menu {
+            margin-top: 0.5rem;
+        }
+
+        #profileDropdown + .dropdown-menu h6 {
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        #profileDropdown + .dropdown-menu .preview-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+        }
+
+        #profileDropdown + .dropdown-menu .preview-item:active,
+        #profileDropdown + .dropdown-menu .preview-item:focus {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        #profileDropdown + .dropdown-menu .preview-thumbnail {
+            margin-right: 10px;
+        }
+
+        #profileDropdown + .dropdown-menu .preview-icon {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #profileDropdown + .dropdown-menu p.text-center {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.75rem;
         }
 
         /* Card styles */
@@ -252,7 +291,7 @@
         }
     </style>
 
-    <link rel="shortcut icon" href="{{ asset('assets/images/favicon.png') }}" />
+    <link rel="shortcut icon" href="{{ asset('Admin/assets/images/favicon.png') }}" />
 
     @stack('styles')
 </head>
@@ -262,7 +301,18 @@
         @include('admin.layouts.navbar')
         
         <!-- Sidebar -->
-        @include('admin.layouts.sidebar')
+        @if(file_exists(resource_path('views/admin/layouts/sidebar.blade.php')))
+            @include('admin.layouts.sidebar')
+        @else
+            <div class="alert alert-danger" style="margin-left: 244px; padding: 20px; margin-top: 70px;">
+                <h4>Error: Missing Sidebar File</h4>
+                <p>The sidebar file <code>resources/views/admin/layouts/sidebar.blade.php</code> is missing or has been deleted.</p>
+                <p>Please restore the file to ensure proper functionality of the admin panel.</p>
+            </div>
+            <script>
+                console.error('Missing required sidebar file: resources/views/admin/layouts/sidebar.blade.php');
+            </script>
+        @endif
         
         <!-- Main Panel -->
         <div class="main-panel">
@@ -283,22 +333,35 @@
     </div>
 
     <!-- Scripts -->
-    <script src="{{ asset('assets/vendors/js/vendor.bundle.base.js') }}"></script>
-    <script src="{{ asset('assets/js/off-canvas.js') }}"></script>
-    <script src="{{ asset('assets/js/hoverable-collapse.js') }}"></script>
-    <script src="{{ asset('assets/js/misc.js') }}"></script>
-    <script src="{{ asset('assets/js/settings.js') }}"></script>
-    <script src="{{ asset('assets/js/todolist.js') }}"></script>
+    <script src="{{ asset('Admin/assets/vendors/js/vendor.bundle.base.js') }}"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('Admin/assets/js/off-canvas.js') }}"></script>
+    <script src="{{ asset('Admin/assets/js/hoverable-collapse.js') }}"></script>
+    <script src="{{ asset('Admin/assets/js/misc.js') }}"></script>
+    <script src="{{ asset('Admin/assets/js/settings.js') }}"></script>
+    <script src="{{ asset('Admin/assets/js/todolist.js') }}"></script>
 
     <!-- Plugin js -->
-    <script src="{{ asset('assets/vendors/chart.js/Chart.min.js') }}"></script>
-    <script src="{{ asset('assets/vendors/progressbar.js/progressbar.min.js') }}"></script>
-    <script src="{{ asset('assets/vendors/jvectormap/jquery-jvectormap.min.js') }}"></script>
-    <script src="{{ asset('assets/vendors/jvectormap/jquery-jvectormap-world-mill-en.js') }}"></script>
-    <script src="{{ asset('assets/vendors/owl-carousel-2/owl.carousel.min.js') }}"></script>
+    <script src="{{ asset('Admin/assets/vendors/chart.js/Chart.min.js') }}"></script>
+    <script src="{{ asset('Admin/assets/vendors/progressbar.js/progressbar.min.js') }}"></script>
+    <script src="{{ asset('Admin/assets/vendors/jvectormap/jquery-jvectormap.min.js') }}"></script>
+    <script src="{{ asset('Admin/assets/vendors/jvectormap/jquery-jvectormap-world-mill-en.js') }}"></script>
+    <script src="{{ asset('Admin/assets/vendors/owl-carousel-2/owl.carousel.min.js') }}"></script>
 
     <!-- Custom js -->
-    <script src="{{ asset('assets/js/dashboard.js') }}"></script>
+    <script src="{{ asset('Admin/assets/js/dashboard.js') }}"></script>
+
+    <!-- Initialize Bootstrap components -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize dropdowns
+            var dropdownElementList = [].slice.call(document.querySelectorAll('[data-bs-toggle="dropdown"]'));
+            var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
+                return new bootstrap.Dropdown(dropdownToggleEl);
+            });
+        });
+    </script>
 
     @stack('scripts')
 </body>

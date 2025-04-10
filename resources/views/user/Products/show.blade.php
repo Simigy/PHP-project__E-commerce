@@ -56,8 +56,9 @@
 
                             <form action="{{ route('user-addToWhishlist', $product->id) }}" method="POST" class="d-inline">
                                 @csrf
-                                <button type="submit" class="btn btn-info">
-                                    <i class="fa fa-heart"></i> Add to Wishlist
+                                <button type="submit" class="btn {{ isset(session('whishlist')[$product->id]) ? 'btn-danger' : 'btn-info' }}">
+                                    <i class="fa fa-heart"></i> 
+                                    {{ isset(session('whishlist')[$product->id]) ? 'Remove from Wishlist' : 'Add to Wishlist' }}
                                 </button>
                             </form>
 
@@ -65,11 +66,22 @@
                                 <form action="{{ route('addToFavorite', $product->id) }}" method="POST"
                                     class="d-inline favorite-form" data-product-id="{{ $product->id }}">
                                     @csrf
-                                    <button type="submit" class="btn btn-danger favorite-btn"
+                                    <button type="submit" 
+                                        class="btn btn-outline-danger favorite-btn {{ in_array($product->id, $favorites ?? []) ? 'active' : '' }}"
                                         id="favorite-btn-{{ $product->id }}">
-                                        <i class="fa fa-heart favorite-icon"></i> Add to Favorites
+                                        <i class="fa fa-heart favorite-icon" 
+                                           style="color: {{ in_array($product->id, $favorites ?? []) ? '#28a745' : '#dc3545' }};">
+                                        </i> 
+                                        <span class="favorite-text">
+                                            {{ in_array($product->id, $favorites ?? []) ? 'Remove from Favorites' : 'Add to Favorites' }}
+                                        </span>
                                     </button>
                                 </form>
+                            @else
+                                <button type="button" class="btn btn-outline-danger guest-favorite-btn">
+                                    <i class="fa fa-heart" style="color: #dc3545;"></i> 
+                                    <span class="favorite-text">Add to Favorites</span>
+                                </button>
                             @endauth
                         </div>
                     </div>
@@ -149,13 +161,79 @@
             gap: 10px;
         }
 
-        .favorite-btn.active .favorite-icon {
-            color: #28a745 !important;
+        .favorite-btn {
+            transition: all 0.3s ease;
+            border: 1px solid #dc3545;
+            background: transparent;
+            color: #dc3545;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            outline: none;
         }
 
-        .favorite-btn .favorite-icon {
+        .favorite-btn:hover {
+            background: #dc3545;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(220, 53, 69, 0.2);
+        }
+
+        .favorite-btn:hover .favorite-icon {
+            color: white !important;
+            transform: scale(1.1);
+        }
+
+        .favorite-btn.active {
+            border-color: #28a745;
+            background: #28a745;
+            color: white;
+        }
+
+        .favorite-btn.active .favorite-icon {
+            color: white !important;
+        }
+
+        .favorite-btn.active:hover {
+            background: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .favorite-icon {
+            transition: all 0.3s ease;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .favorite-text {
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .guest-favorite-btn {
+            transition: all 0.3s ease;
+            border: 1px solid #dc3545;
+            background: transparent;
             color: #dc3545;
-            transition: color 0.3s ease;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .guest-favorite-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(220, 53, 69, 0.2);
+        }
+
+        .guest-favorite-btn.active {
+            background: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+
+        .guest-favorite-btn.active i {
+            color: white !important;
         }
     </style>
 @endpush
@@ -163,8 +241,6 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
-            console.log('Document ready');
-
             // Update hidden input when quantity dropdown changes
             $('#qty').on('change', function() {
                 var quantity = $(this).val();
@@ -174,16 +250,12 @@
             // Handle favorite button click
             $('.favorite-form').on('submit', function(e) {
                 e.preventDefault();
-                console.log('Favorite form submitted');
 
                 var form = $(this);
                 var productId = form.data('product-id');
                 var button = $('#favorite-btn-' + productId);
                 var icon = button.find('.favorite-icon');
-
-                console.log('Product ID:', productId);
-                console.log('Button:', button);
-                console.log('Icon:', icon);
+                var textSpan = button.find('.favorite-text');
 
                 $.ajax({
                     url: form.attr('action'),
@@ -192,29 +264,79 @@
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
-                    success: function(response) {
-                        console.log('Success response:', response);
-
-                        // Toggle active class on button
-                        button.toggleClass('active');
-
-                        // Toggle icon color
-                        if (button.hasClass('active')) {
-                            icon.css('color', '#28a745');
-                        } else {
-                            icon.css('color', '#dc3545');
-                        }
-
-                        // Show success message
-                        alert(response.message || 'Product added to favorites!');
+                    beforeSend: function() {
+                        button.prop('disabled', true);
+                        button.css('opacity', '0.7');
                     },
-                    error: function(xhr, status, error) {
-                        console.error('Error:', error);
-                        console.error('Status:', status);
-                        console.error('Response:', xhr.responseText);
-                        alert('An error occurred. Please try again.');
+                    success: function(response) {
+                        if (response.success) {
+                            // Toggle active class
+                            button.toggleClass('active');
+                            
+                            if (response.status) { // Added to favorites
+                                button.css('background-color', '#28a745');
+                                button.css('border-color', '#28a745');
+                                icon.css('color', 'white');
+                                textSpan.text('Remove from Favorites');
+                                
+                                // Add animation
+                                icon.css('transform', 'scale(1.3)');
+                                setTimeout(() => {
+                                    icon.css('transform', 'scale(1)');
+                                }, 200);
+                            } else { // Removed from favorites
+                                button.css('background-color', 'transparent');
+                                button.css('border-color', '#dc3545');
+                                icon.css('color', '#dc3545');
+                                textSpan.text('Add to Favorites');
+                                
+                                // Add animation
+                                icon.css('transform', 'scale(0.8)');
+                                setTimeout(() => {
+                                    icon.css('transform', 'scale(1)');
+                                }, 200);
+                            }
+                        }
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 401) {
+                            window.location.href = "{{ route('login') }}";
+                        }
+                    },
+                    complete: function() {
+                        button.prop('disabled', false);
+                        button.css('opacity', '1');
                     }
                 });
+            });
+
+            // Handle guest favorite button click
+            $(document).on('click', '.guest-favorite-btn', function() {
+                var button = $(this);
+                var icon = button.find('i');
+                var text = button.find('.favorite-text');
+                
+                if (!button.hasClass('active')) {
+                    icon.css('color', '#28a745');
+                    button.css('background-color', '#28a745');
+                    button.css('border-color', '#28a745');
+                    button.addClass('active');
+                    text.text('Remove from Favorites');
+                    icon.css('transform', 'scale(1.2)');
+                    setTimeout(() => {
+                        icon.css('transform', 'scale(1)');
+                    }, 200);
+                } else {
+                    icon.css('color', '#dc3545');
+                    button.css('background-color', 'transparent');
+                    button.css('border-color', '#dc3545');
+                    button.removeClass('active');
+                    text.text('Add to Favorites');
+                    icon.css('transform', 'scale(0.8)');
+                    setTimeout(() => {
+                        icon.css('transform', 'scale(1)');
+                    }, 200);
+                }
             });
         });
     </script>

@@ -2,9 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
@@ -12,24 +11,34 @@ class Product extends Model
 
     protected $fillable = [
         'name',
+        'description',
         'price',
+        'image',
+        'category_id',
         'quantity',
-        'desc',
-        'image'
+        'status'
     ];
 
-    protected $casts = [
-        'price' => 'decimal:2',
-        'quantity' => 'integer',
-    ];
-    
-    public function favorites()
+    public function category()
     {
-        return $this->hasMany(Favorite::class);
+        return $this->belongsTo(Category::class);
     }
 
-    public function isFavorites()
+    public function favorites()
     {
-        return $this->favorites()->where('user_id', Auth::user()->id)->exists();
+        return $this->belongsToMany(User::class, 'favorites', 'product_id', 'user_id');
+    }
+
+    public function getIsFavoritedAttribute()
+    {
+        if (auth()->check()) {
+            return $this->favorites()->where('user_id', auth()->id())->exists();
+        }
+        return false;
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
     }
 }

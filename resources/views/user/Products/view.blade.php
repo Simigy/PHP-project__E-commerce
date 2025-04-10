@@ -25,51 +25,69 @@
                         <p>{{ $product->desc }}</p>
                     </div>
                     <div class="product-stock">
-                        <span class="badge badge-success">In Stock: {{ $product->quantity }}</span>
+                        <span class="badge badge-{{ $product->quantity > 0 ? 'success' : 'danger' }}">
+                            {{ $product->quantity > 0 ? 'In Stock: ' . $product->quantity : 'Out of Stock' }}
+                        </span>
                     </div>
-                    <div class="product-rating">
-                        <ul class="stars">
-                            <li><i class="fa fa-star"></i></li>
-                            <li><i class="fa fa-star"></i></li>
-                            <li><i class="fa fa-star"></i></li>
-                            <li><i class="fa fa-star"></i></li>
-                            <li><i class="fa fa-star"></i></li>
-                        </ul>
-                    </div>
-                    <div class="product-actions mt-4">
-                        <div class="quantity-selector mb-3">
-                            <label for="qty">Quantity:</label>
-                            <select id="qty" class="form-control d-inline-block" style="width: 100px;">
-                                @for($i = 1; $i <= min(10, $product->quantity); $i++)
-                                    <option value="{{ $i }}">{{ $i }}</option>
+                    <div class="product-rating mb-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="stars me-3">
+                                @php
+                                    $rating = $product->reviews_avg_rating ?? 5;
+                                    $fullStars = floor($rating);
+                                    $halfStar = $rating - $fullStars >= 0.5;
+                                @endphp
+                                @for($i = 1; $i <= 5; $i++)
+                                    @if($i <= $fullStars)
+                                        <i class="fa fa-star"></i>
+                                    @elseif($i == $fullStars + 1 && $halfStar)
+                                        <i class="fa fa-star-half-o"></i>
+                                    @else
+                                        <i class="fa fa-star-o"></i>
+                                    @endif
                                 @endfor
-                            </select>
+                                <span class="rating-count ms-2">({{ $product->reviews_count ?? 0 }} reviews)</span>
+                            </div>
+                            <form action="{{ route('addToFavorite', $product->id) }}" method="POST" class="d-inline favorite-form" data-product-id="{{ $product->id }}">
+                                @csrf
+                                <button type="submit" class="btn {{ Auth::check() ? 'btn-danger' : 'btn-link p-0' }} favorite-btn {{ in_array($product->id, session('favorites', [])) ? 'active' : '' }}" id="favorite-btn-{{ $product->id }}">
+                                    <i class="fa fa-heart {{ Auth::check() ? '' : 'fa-2x' }}"></i>
+                                    @if(Auth::check())
+                                        <span class="favorite-text">{{ in_array($product->id, session('favorites', [])) ? 'Remove from Favorites' : 'Add to Favorites' }}</span>
+                                    @endif
+                                </button>
+                                <span class="favorite-count ms-2">{{ $product->favorites_count ?? 0 }} favorites</span>
+                            </form>
                         </div>
-                        
-                        <form action="{{ route('user-addToCart', $product->id) }}" method="POST" class="d-inline">
-                            @csrf
-                            <input type="hidden" name="qty" id="qty-input" value="1">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fa fa-shopping-cart"></i> Add to Cart
-                            </button>
-                        </form>
-                        
-                        <form action="{{ route('user-addToWhishlist', $product->id) }}" method="POST" class="d-inline">
-                            @csrf
-                            <button type="submit" class="btn btn-info">
-                                <i class="fa fa-heart"></i> Add to Wishlist
-                            </button>
-                        </form>
-                        
-                        @auth
-                        <form action="{{ route('addToFavorite', $product->id) }}" method="POST" class="d-inline favorite-form" data-product-id="{{ $product->id }}">
-                            @csrf
-                            <button type="submit" class="btn btn-danger favorite-btn" id="favorite-btn-{{ $product->id }}">
-                                <i class="fa fa-heart favorite-icon"></i> Add to Favorites
-                            </button>
-                        </form>
-                        @endauth
                     </div>
+                    
+                    @if(Auth::check())
+                        <div class="product-actions mt-4">
+                            <div class="quantity-selector mb-3">
+                                <label for="qty">Quantity:</label>
+                                <select id="qty" class="form-control d-inline-block" style="width: 100px;">
+                                    @for($i = 1; $i <= min(10, $product->quantity); $i++)
+                                        <option value="{{ $i }}">{{ $i }}</option>
+                                    @endfor
+                                </select>
+                            </div>
+                            
+                            <form action="{{ route('user-addToCart', $product->id) }}" method="POST" class="d-inline">
+                                @csrf
+                                <input type="hidden" name="qty" id="qty-input" value="1">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa fa-shopping-cart"></i> Add to Cart
+                                </button>
+                            </form>
+                            
+                            <form action="{{ route('user-addToWhishlist', $product->id) }}" method="POST" class="d-inline">
+                                @csrf
+                                <button type="submit" class="btn btn-info">
+                                    <i class="fa fa-bookmark"></i> Add to Wishlist
+                                </button>
+                            </form>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -119,32 +137,66 @@
         margin: 20px 0;
     }
     
-    .product-rating {
-        margin: 20px 0;
+    .favorite-btn {
+        transition: all 0.3s ease !important;
+        position: relative;
+        outline: none !important;
     }
-    
-    .stars {
-        list-style: none;
+
+    .favorite-btn.active {
+        background-color: #28a745 !important;
+        border-color: #28a745 !important;
+        color: white !important;
+    }
+
+    .favorite-btn.active i {
+        color: white !important;
+    }
+
+    .favorite-btn:not(.active) i {
+        color: #dc3545;
+    }
+
+    .favorite-btn:not(.active):hover i {
+        color: #28a745;
+    }
+
+    .favorite-btn.btn-link {
+        border: none;
+        background: none;
         padding: 0;
-        margin: 0;
-        display: flex;
     }
-    
-    .stars li {
-        margin-right: 5px;
+
+    .favorite-btn.btn-link i {
+        font-size: 24px;
+        transition: all 0.3s ease;
+    }
+
+    .favorite-btn.btn-link:hover {
+        transform: scale(1.1);
+    }
+
+    .favorite-btn:focus {
+        box-shadow: none !important;
+    }
+
+    .favorite-count {
+        font-size: 14px;
+        color: #666;
+        margin-left: 8px;
+    }
+
+    .stars {
         color: #ffc107;
     }
-    
-    .product-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
+
+    .stars i {
+        margin-right: 2px;
     }
-    
-    .quantity-selector {
-        display: flex;
-        align-items: center;
-        gap: 10px;
+
+    .rating-count {
+        color: #666;
+        font-size: 14px;
     }
 </style>
 @endpush
@@ -159,14 +211,13 @@ $(document).ready(function() {
     });
     
     // Handle favorite button click
-    $('.favorite-btn').on('click', function(e) {
+    $('.favorite-form').on('submit', function(e) {
         e.preventDefault();
-        var button = $(this);
-        var form = button.closest('form');
-        var productId = form.data('product-id');
-        
-        // Toggle active class immediately for visual feedback
-        button.toggleClass('active');
+        var form = $(this);
+        var button = form.find('.favorite-btn');
+        var icon = button.find('i');
+        var countSpan = form.find('.favorite-count');
+        var textSpan = button.find('.favorite-text');
         
         $.ajax({
             url: form.attr('action'),
@@ -175,13 +226,43 @@ $(document).ready(function() {
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
-            success: function(response) {
-                alert(response.message || 'Product added to favorites!');
+            beforeSend: function() {
+                button.prop('disabled', true);
             },
-            error: function(xhr, status, error) {
-                // Revert the button state if there was an error
-                button.toggleClass('active');
-                alert('An error occurred. Please try again.');
+            success: function(response) {
+                if (response.success) {
+                    button.toggleClass('active');
+                    
+                    if (button.hasClass('active')) {
+                        if (button.hasClass('btn-danger')) {
+                            button.removeClass('btn-danger').addClass('btn-success');
+                        }
+                        if (textSpan.length) {
+                            textSpan.text('Remove from Favorites');
+                        }
+                    } else {
+                        if (button.hasClass('btn-success')) {
+                            button.removeClass('btn-success').addClass('btn-danger');
+                        }
+                        if (textSpan.length) {
+                            textSpan.text('Add to Favorites');
+                        }
+                    }
+                    
+                    if (response.favorites_count !== undefined) {
+                        countSpan.text(response.favorites_count + ' favorites');
+                    }
+                }
+            },
+            error: function(xhr) {
+                if (xhr.status === 401) {
+                    window.location.href = '{{ route("login") }}';
+                } else {
+                    alert('Error updating favorite status');
+                }
+            },
+            complete: function() {
+                button.prop('disabled', false);
             }
         });
     });

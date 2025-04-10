@@ -20,9 +20,9 @@
 
         @if(!$cart || count($cart) === 0)
             <div class="row">
-                <div class="col-md-12 text-center">
+                <div class="text-center col-md-12">
                     <h3>Your cart is empty</h3>
-                    <a href="{{route('user-all-products')}}" class="btn btn-primary mt-3">Continue Shopping</a>
+                    <a href="{{route('user-all-products')}}" class="mt-3 btn btn-primary">Continue Shopping</a>
                 </div>
             </div>
         @else
@@ -55,7 +55,7 @@
                                             <form action="{{ route('user-addToCart', $id) }}" method="POST" class="d-inline">
                                                 @csrf
                                                 <input type="number" name="qty" value="{{ $product['quantity'] }}" min="1" max="100" class="form-control form-control-sm" style="width: 70px;">
-                                                <button type="submit" class="btn btn-sm btn-info mt-1">Update</button>
+                                                <button type="submit" class="mt-1 btn btn-sm btn-info">Update</button>
                                             </form>
                                         </td>
                                         <td>${{ number_format($itemTotal, 2) }}</td>
@@ -93,24 +93,21 @@
                             <h4>Order Summary</h4>
                         </div>
                         <div class="card-body">
-                            <div class="d-flex justify-content-between mb-2">
+                            <div class="mb-2 d-flex justify-content-between">
                                 <span>Subtotal:</span>
                                 <span>${{ number_format($total, 2) }}</span>
                             </div>
-                            <div class="d-flex justify-content-between mb-2">
+                            <div class="mb-2 d-flex justify-content-between">
                                 <span>Shipping:</span>
                                 <span>Free</span>
                             </div>
                             <hr>
-                            <div class="d-flex justify-content-between mb-3">
+                            <div class="mb-3 d-flex justify-content-between">
                                 <strong>Total:</strong>
                                 <strong>${{ number_format($total, 2) }}</strong>
                             </div>
 
-                            <form action="{{ route('makeOrder') }}" method="POST" id="checkout-form">
-                                @csrf
-                                <button type="submit" class="btn btn-primary btn-block">Proceed to Checkout</button>
-                            </form>
+                            <a href="{{ route('checkout') }}" class="btn btn-primary btn-block">Proceed to Checkout</a>
                         </div>
                     </div>
                 </div>
@@ -140,32 +137,4 @@
         border-bottom: 1px solid #eee;
     }
 </style>
-@endpush
-
-@push('scripts')
-<script>
-$(document).ready(function() {
-    // Handle checkout form submission
-    $('#checkout-form').on('submit', function(e) {
-        e.preventDefault();
-        var form = $(this);
-
-        $.ajax({
-            url: form.attr('action'),
-            type: 'POST',
-            data: form.serialize(),
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function(response) {
-                window.location.href = "/user/products";
-            },
-            error: function(xhr, status, error) {
-                console.error('Error:', error);
-                alert('An error occurred during checkout. Please try again.');
-            }
-        });
-    });
-});
-</script>
 @endpush

@@ -16,9 +16,12 @@ class ProductController extends Controller
     public function all()
     {
         try {
-            $products = Product::paginate(12);
-            $favorites = [];
+            $products = Product::withCount('favorites')
+                ->withAvg('reviews', 'rating')
+                ->withCount('reviews')
+                ->paginate(12);
 
+            $favorites = [];
             if (Auth::check()) {
                 $favorites = Favorite::where('user_id', Auth::id())
                     ->pluck('product_id')
@@ -33,8 +36,24 @@ class ProductController extends Controller
     }
     public function show($id)
     {
-        $product = Product::findOrFail($id);
-        return view('user.products.show', compact('product'));
+        try {
+            $product = Product::withCount('favorites')
+                ->withAvg('reviews', 'rating')
+                ->withCount('reviews')
+                ->findOrFail($id);
+            
+            $favorites = [];
+            if (Auth::check()) {
+                $favorites = Favorite::where('user_id', Auth::id())
+                    ->pluck('product_id')
+                    ->toArray();
+            }
+
+            return view('user.Products.view', compact('product', 'favorites'));
+        } catch (\Exception $e) {
+            Log::error('Error in show method: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'An error occurred while loading the product.');
+        }
     }
     public function addToCart($id, Request $request)
     {
@@ -195,6 +214,38 @@ class ProductController extends Controller
     {
         try {
             $product = Product::findOrFail($id);
+            
+            // Handle guest favorites using session
+            if (!Auth::check()) {
+                $guestFavorites = session()->get('guest_favorites', []);
+                
+                if (in_array($id, $guestFavorites)) {
+                    // Remove from favorites
+                    $guestFavorites = array_diff($guestFavorites, [$id]);
+                    $message = 'Product removed from favorites';
+                    $status = false;
+                } else {
+                    // Add to favorites
+                    $guestFavorites[] = $id;
+                    $message = 'Product added to favorites';
+                    $status = true;
+                }
+                
+                session()->put('guest_favorites', $guestFavorites);
+                
+                if (request()->ajax()) {
+                    return response()->json([
+                        'success' => true,
+                        'message' => $message,
+                        'status' => $status,
+                        'favorites_count' => count($guestFavorites)
+                    ]);
+                }
+                
+                return redirect()->back()->with('success', $message);
+            }
+
+            // Handle authenticated user favorites
             $user = Auth::user();
             $favorite = Favorite::where('user_id', $user->id)->where('product_id', $id)->first();
 
@@ -215,7 +266,8 @@ class ProductController extends Controller
                 return response()->json([
                     'success' => true,
                     'message' => $message,
-                    'status' => $status
+                    'status' => $status,
+                    'favorites_count' => Favorite::where('product_id', $id)->count()
                 ]);
             }
 
@@ -232,5 +284,25 @@ class ProductController extends Controller
 
             return redirect()->back()->with('error', 'An error occurred while updating favorites');
         }
+    }
+    public function toggleFavorite(Product $product)
+    {
+        $user = auth()->user();
+        
+        if ($user->favorites()->where('product_id', $product->id)->exists()) {
+            $user->favorites()->detach($product->id);
+            $isFavorited = false;
+        } else {
+            $user->favorites()->attach($product->id);
+            $isFavorited = true;
+        }
+        
+        $count = $product->favorites()->count();
+        
+        return response()->json([
+            'success' => true,
+            'is_favorited' => $isFavorited,
+            'count' => $count
+        ]);
     }
 }

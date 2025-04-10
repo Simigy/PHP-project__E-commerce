@@ -33,7 +33,7 @@
                     <a href="/user/products">view all products <i class="fa fa-angle-right"></i></a>
                 </div>
             </div>
-            @foreach($products as $product)
+            @forelse($products as $product)
             <div class="col-md-4">
                 <div class="product-item">
                     <div class="product-image-container">
@@ -52,8 +52,8 @@
                         <a href="{{ route('user-show-product', $product->id) }}">
                             <h4>{{ $product->name }}</h4>
                         </a>
-                        <h6>${{ $product->price }}</h6>
-                        <p>{{ Str::limit($product->desc, 100) }}</p>
+                        <h6>${{ number_format($product->price, 2) }}</h6>
+                        <p>{{ Str::limit($product->description, 100) }}</p>
                         <span>Stock: {{ $product->quantity }}</span>
                         <ul class="stars">
                             <li><i class="fa fa-star"></i></li>
@@ -99,7 +99,13 @@
                     </div>
                 </div>
             </div>
-            @endforeach
+            @empty
+            <div class="col-12">
+                <div class="alert alert-info">
+                    No products available at the moment.
+                </div>
+            </div>
+            @endforelse
         </div>
     </div>
 </div>

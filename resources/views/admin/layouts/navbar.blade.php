@@ -1,3 +1,6 @@
+<!-- Add CSRF Token -->
+<meta name="csrf-token" content="{{ csrf_token() }}">
+
 <!-- partial:partials/_navbar.html -->
 <nav class="flex-row p-0 navbar fixed-top d-flex">
     <div class="navbar-brand-wrapper d-flex d-lg-none align-items-center justify-content-center">
@@ -67,9 +70,9 @@
 
             <!-- Profile -->
             <li class="nav-item dropdown">
-                <a class="nav-link" id="profileDropdown" href="#" data-bs-toggle="dropdown">
+                <a class="nav-link" id="profileDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
                     <div class="navbar-profile">
-                        <img class="img-xs rounded-circle" src="{{ asset('assets/images/faces/face15.jpg') }}" alt="">
+                        <img class="img-xs rounded-circle" src="{{ asset('Admin/assets/images/faces/face15.jpg') }}" alt="">
                         <p class="mb-0 d-none d-sm-block navbar-profile-name">{{ Auth::user()->name }}</p>
                         <i class="mdi mdi-menu-down d-none d-sm-block"></i>
                     </div>
@@ -88,19 +91,18 @@
                         </div>
                     </a>
                     <div class="dropdown-divider"></div>
-                    <form method="POST" action="{{ route('logout') }}" id="logout-form">
+                    <form method="POST" action="{{ route('logout') }}" id="logout-form" style="margin: 0; padding: 0;">
                         @csrf
-                        <a class="dropdown-item preview-item" href="#"
-                           onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                        <button type="submit" class="dropdown-item preview-item" style="border: none; width: 100%; background: none; cursor: pointer;">
                             <div class="preview-thumbnail">
                                 <div class="preview-icon bg-dark rounded-circle">
                                     <i class="mdi mdi-logout text-danger"></i>
                                 </div>
                             </div>
                             <div class="preview-item-content">
-                                <p class="mb-1 preview-subject">{{ __('message.logout') }}</p>
+                                <p class="mb-1 preview-subject">Log out</p>
                             </div>
-                        </a>
+                        </button>
                     </form>
                 </div>
             </li>
@@ -117,3 +119,50 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 @endif
+
+<script>
+function handleLogout(event) {
+    event.preventDefault();
+    const form = document.getElementById('logout-form');
+    const logoutText = document.getElementById('logout-text');
+    const button = event.currentTarget;
+    
+    // Disable the button and show loading state
+    button.disabled = true;
+    logoutText.textContent = 'Logging out...';
+    
+    fetch(form.action, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        },
+        body: new FormData(form),
+        credentials: 'same-origin'
+    }).then(response => {
+        if (response.ok || response.redirected) {
+            window.location.href = '{{ route("login") }}';
+        } else {
+            throw new Error('Logout failed');
+        }
+    }).catch(error => {
+        console.error('Logout error:', error);
+        // Reset button state
+        button.disabled = false;
+        logoutText.textContent = '{{ __("message.logout") }}';
+        alert('Logout failed. Please try again.');
+    });
+}
+
+// Add hover effect for the logout button
+document.addEventListener('DOMContentLoaded', function() {
+    const logoutButton = document.querySelector('#logout-form button');
+    if (logoutButton) {
+        logoutButton.addEventListener('mouseover', function() {
+            this.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+        });
+        logoutButton.addEventListener('mouseout', function() {
+            this.style.backgroundColor = '';
+        });
+    }
+});
+</script>
