@@ -1,0 +1,119 @@
+.banner {
+    position: relative;
+    text-align: center;
+    padding-top: 80px;
+}
+
+.banner .owl-banner {
+    position: relative;
+}
+
+.banner .owl-nav {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    transform: translateY(-50%);
+}
+
+.banner .owl-nav button {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-radius: 50% !important;
+    background: rgba(255,255,255,0.7) !important;
+    color: #000 !important;
+    font-size: 20px !important;
+    line-height: 40px !important;
+    margin: 0 20px;
+    transition: all 0.3s ease;
+}
+
+.banner .owl-nav button:hover {
+    background: rgba(255,255,255,0.9) !important;
+}
+
+.banner .owl-nav .owl-prev {
+    left: 0;
+}
+
+.banner .owl-nav .owl-next {
+    right: 0;
+}
+
+.banner .owl-dots {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    text-align: center;
+}
+
+.banner .owl-dots button.owl-dot {
+    width: 10px;
+    height: 10px;
+    margin: 0 5px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.5) !important;
+}
+
+.banner .owl-dots button.owl-dot.active {
+    background: #fff !important;
+}
+
+.banner-item-01,
+.banner-item-02,
+.banner-item-03 {
+    padding: 300px 0px;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+.banner-item-01 {
+    background-image: url(../images/slide_01.jpg);
+}
+
+.banner-item-02 {
+    background-image: url(../images/slide_02.jpg);
+}
+
+.banner-item-03 {
+    background-image: url(../images/slide_03.jpg);
+}
+
+.banner .text-content {
+    text-align: center;
+    color: #fff;
+}
+
+.banner .text-content h4 {
+    font-size: 22px;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.banner .text-content h2 {
+    font-size: 62px;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+@media (max-width: 768px) {
+    .banner .text-content {
+        width: 90%;
+        margin-left: 5%;
+    }
+    .banner .text-content h4 {
+        font-size: 22px;
+    }
+    .banner .text-content h2 {
+        font-size: 36px;
+        letter-spacing: 0.5px;
+    }
+    .banner-item-01,
+    .banner-item-02,
+    .banner-item-03 {
+        padding: 180px 0px;
+    }
+}

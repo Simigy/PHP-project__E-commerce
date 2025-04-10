@@ -1,0 +1,38 @@
+module.exports = {
+    plugins: {
+        'postcss-import': {},
+        'tailwindcss/nesting': {},
+        tailwindcss: {},
+        autoprefixer: {},
+        cssnano: {
+            preset: ['default', {
+                discardComments: {
+                    removeAll: true,
+                },
+                minifyFontValues: true,
+                minifySelectors: true,
+                normalizeWhitespace: true,
+                calc: true,
+                colormin: true,
+                convertValues: true,
+                discardEmpty: true,
+                discardOverridden: true,
+                mergeLonghand: true,
+                mergeRules: true,
+                minifyGradients: true,
+                minifyParams: true,
+                normalizeCharset: true,
+                normalizePositions: true,
+                normalizeRepeatStyle: true,
+                normalizeString: true,
+                normalizeTimingFunctions: true,
+                normalizeUnicode: true,
+                normalizeUrl: true,
+                orderedValues: true,
+                reduceInitial: true,
+                reduceTransforms: true,
+                uniqueSelectors: true,
+            }],
+        },
+    },
+};
